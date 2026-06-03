@@ -15,6 +15,26 @@ from aiogram.types import (
 from aiogram.client.default import DefaultBotProperties 
 
 # ==========================================
+# ДОПОЛНИТЕЛЬНЫЙ БЛОК ДЛЯ СЕРВЕРА (ЧТОБЫ БОТ НЕ ЗАСЫПАЛ)
+# ==========================================
+from flask import Flask
+from threading import Thread
+
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Eynec is Alive!"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    t = Thread(target=run_flask)
+    t.start()
+
+# ==========================================
 # КОНФИГУРАЦИЯ (Проект Eynec)
 # ==========================================
 TOKEN = "8752597276:AAEnYRqMQhaNXdvIge5pzQavv03otSnoOyc" 
@@ -187,6 +207,9 @@ async def view_profile(callback: types.CallbackQuery):
 # ЗАПУСК
 # ==========================================
 async def main():
+    # Запускаем фоновый веб-сервер для Render перед запуском бота
+    keep_alive()
+
     # Кнопка сайта "info" в углу ( Menu Button )
     await bot.set_chat_menu_button(
         menu_button=MenuButtonWebApp(
